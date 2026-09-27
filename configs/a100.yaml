@@ -1,0 +1,64 @@
+seed: 42
+paths:
+  data_dir: /workspace/dataset
+  work_dir: /workspace/work
+  output_dir: /workspace/output
+runtime:
+  threads: 32
+  workers: 16
+  device: cuda
+  mixed_precision: true
+validation:
+  folds: 5
+  evaluation_fold: 0
+  beta: 0.5
+normalization:
+  transliteration: anyascii
+  keep_native: true
+candidates:
+  top_k: 160
+  final_cap: 300
+  rrf_k: 60
+  sparse:
+    enabled: true
+    fields: [name, address, combined, romanized]
+    ngram_range: [2, 5]
+    max_features: 500000
+    top_k: 150
+  dense:
+    enabled: true
+    model: Qwen/Qwen3-Embedding-0.6B
+    revision: null
+    top_k: 120
+    batch_size: 256
+features:
+  include_collective: true
+gbdt:
+  folds: 5
+  rounds: 700
+  params:
+    objective: binary
+    learning_rate: 0.05
+    num_leaves: 255
+    min_data_in_leaf: 300
+    feature_fraction: 0.75
+    bagging_fraction: 0.8
+    bagging_freq: 1
+    lambda_l2: 2.0
+    max_bin: 127
+    force_row_wise: true
+reranker:
+  enabled: true
+  model: Qwen/Qwen3-Reranker-4B
+  revision: null
+  top_n: 20
+  max_queries: 500000
+  batch_size: 16
+  max_tokens: 512
+  ambiguity_fraction: 0.2
+decoder:
+  strategy: expected_f_exclusive
+  threshold: 0.7
+  k_max: 25
+  extra_miss: 0.0
+

@@ -1,0 +1,30 @@
+# Fully runnable CPU baseline used by `amazon-er baseline ...`.
+seed: 42
+data_dir: dataset
+output_dir: output
+work_dir: work/baseline
+sample_entities: 50000
+chunk_size: 100000
+index_batch_size: 25000
+block_limit: 100
+composite_blocks: true
+top_k: 15
+prefilter_k: 30
+tfidf_sample: 80000
+tfidf_max_features: 200000
+ngram_range: [3, 5]
+inference_batch_size: 1000
+full_training_batch_size: 4000
+full_eval_entities: 50000
+hard_negatives_per_entity: 5
+threads: 16
+workers: 8
+model:
+  n_estimators: 400
+  learning_rate: 0.05
+  num_leaves: 63
+  min_child_samples: 100
+  colsample_bytree: 0.85
+  reg_lambda: 2.0
+threshold_grid: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.925, 0.95, 0.975, 0.99]
+

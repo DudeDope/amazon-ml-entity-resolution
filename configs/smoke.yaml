@@ -1,0 +1,58 @@
+seed: 42
+paths:
+  data_dir: dataset
+  work_dir: .smoke-work
+  output_dir: .smoke-output
+runtime:
+  threads: 2
+  workers: 1
+  device: cpu
+  mixed_precision: false
+validation:
+  folds: 3
+  evaluation_fold: 0
+  beta: 0.5
+normalization:
+  transliteration: anyascii
+  keep_native: true
+candidates:
+  top_k: 10
+  final_cap: 20
+  rrf_k: 30
+  sparse:
+    enabled: true
+    fields: [name, address, combined]
+    ngram_range: [3, 5]
+    max_features: 5000
+    top_k: 10
+  dense:
+    enabled: false
+    model: Qwen/Qwen3-Embedding-0.6B
+    revision: null
+    top_k: 10
+features:
+  include_collective: true
+gbdt:
+  folds: 3
+  rounds: 50
+  params:
+    learning_rate: 0.08
+    num_leaves: 15
+    min_data_in_leaf: 1
+    min_data_in_bin: 1
+    feature_fraction: 0.9
+    bagging_fraction: 0.9
+    bagging_freq: 1
+reranker:
+  enabled: false
+  model: Qwen/Qwen3-Reranker-4B
+  revision: null
+  top_n: 10
+  max_queries: 100
+  batch_size: 2
+  max_tokens: 256
+decoder:
+  strategy: expected_f_exclusive
+  threshold: 0.7
+  k_max: 11
+  extra_miss: 0.0

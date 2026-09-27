@@ -1,0 +1,44 @@
+# Data and generated artifacts
+dataset/
+data/
+artifacts/
+cache/
+checkpoints/
+output/
+work/
+.smoke-work/
+.smoke-output/
+reports/generated/
+*.parquet
+*.npy
+*.npz
+*.joblib
+*.bin
+*.safetensors
+*.tsv
+*.zip
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets and local configuration
+.env
+*.pem
+*.key
+configs/local.yaml
