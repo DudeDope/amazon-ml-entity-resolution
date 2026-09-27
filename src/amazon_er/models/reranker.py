@@ -58,8 +58,12 @@ class QwenYesNoReranker:
             low_cpu_mem_usage=True,
             **kwargs,
         ).to(self.device).eval()
-        self.no_id = self.tokenizer.convert_tokens_to_ids("no")
-        self.yes_id = self.tokenizer.convert_tokens_to_ids("yes")
+        no_ids = self.tokenizer.encode("no", add_special_tokens=False)
+        yes_ids = self.tokenizer.encode("yes", add_special_tokens=False)
+        if not no_ids or not yes_ids:
+            raise ValueError("Tokenizer cannot encode the yes/no answer tokens")
+        self.no_id = no_ids[-1]
+        self.yes_id = yes_ids[-1]
         self.prefix = (
             '<|im_start|>system\nJudge whether the Document meets the Query. '
             'Answer only "yes" or "no".<|im_end|>\n<|im_start|>user\n'
@@ -105,4 +109,3 @@ class QwenYesNoReranker:
                 gc.collect()
                 self.torch.cuda.empty_cache()
         return np.asarray(result, dtype=np.float32)
-

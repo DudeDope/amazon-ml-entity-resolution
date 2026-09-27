@@ -76,10 +76,10 @@ dataset/
 Run the audited CPU baseline:
 
 ```bash
-amazon-er baseline audit --config configs/production.yaml
-amazon-er baseline train --config configs/production.yaml --ood --ablations
-amazon-er baseline train-full --config configs/production.yaml
-amazon-er baseline predict --config configs/production.yaml
+amazon-er baseline audit --config configs/baseline.yaml
+amazon-er baseline train --config configs/baseline.yaml --ood --ablations
+amazon-er baseline train-full --config configs/baseline.yaml
+amazon-er baseline predict --config configs/baseline.yaml
 ```
 
 Run the modular advanced stages:

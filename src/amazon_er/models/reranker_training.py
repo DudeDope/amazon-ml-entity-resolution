@@ -44,6 +44,8 @@ def train_lora(
     if revision:
         kwargs["revision"] = revision
     tokenizer = AutoTokenizer.from_pretrained(model_name, **kwargs)
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
         model_name, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True, **kwargs
     )
@@ -58,15 +60,24 @@ def train_lora(
             "Determine whether these business records match.\nQuery: " + q + "\nDocument: " + t + "\nAnswer:"
             for q, t in zip(batch["query_text"], batch["target_text"])
         ]
-        answers = [" yes" if int(value) else " no" for value in batch["label"]]
-        full = [prompt + answer for prompt, answer in zip(prompts, answers)]
-        encoded = tokenizer(full, truncation=True, max_length=512, padding="max_length")
-        labels = []
-        for ids, prompt in zip(encoded["input_ids"], prompts):
-            prefix_length = len(tokenizer(prompt, add_special_tokens=False)["input_ids"])
-            labels.append([-100] * min(prefix_length, len(ids)) + ids[prefix_length:])
-        encoded["labels"] = labels
-        return encoded
+        input_ids, attention_masks, labels = [], [], []
+        for prompt, value in zip(prompts, batch["label"]):
+            answer = " yes" if int(value) else " no"
+            answer_ids = tokenizer.encode(answer, add_special_tokens=False)
+            if tokenizer.eos_token_id is not None:
+                answer_ids = answer_ids + [tokenizer.eos_token_id]
+            prompt_ids = tokenizer.encode(
+                prompt,
+                add_special_tokens=True,
+                truncation=True,
+                max_length=512 - len(answer_ids),
+            )
+            ids = prompt_ids + answer_ids
+            padding = 512 - len(ids)
+            input_ids.append(ids + [tokenizer.pad_token_id] * padding)
+            attention_masks.append([1] * len(ids) + [0] * padding)
+            labels.append([-100] * len(prompt_ids) + answer_ids + [-100] * padding)
+        return {"input_ids": input_ids, "attention_mask": attention_masks, "labels": labels}
 
     tokenized = data.map(tokenize, batched=True, remove_columns=data.column_names)
     arguments = TrainingArguments(
@@ -83,4 +94,3 @@ def train_lora(
     Trainer(model=model, args=arguments, train_dataset=tokenized).train()
     model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
-
